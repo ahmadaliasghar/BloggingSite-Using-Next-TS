@@ -1,0 +1,15 @@
+.blogs {
+    margin: 1% 3%;
+}
+
+.blogitem {
+    padding: 1%;
+    border: 1px solid grey;
+    border-radius: 10px;
+    margin: 1%;
+    cursor: pointer;
+}
+
+.blogitem:hover {
+    border: 2px solid grey;
+}
