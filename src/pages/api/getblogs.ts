@@ -2,10 +2,13 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as fs from "fs";
 
+// http://localhost:3000/api/getblogs?slug=learn-java 
+
 type Data = {
   data: string[];
   error: string;
 };
+
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>

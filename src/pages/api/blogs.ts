@@ -3,20 +3,24 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import * as fs from "fs";
 
 type Data = {
-  data: string[];
   error: string;
 };
-export default function handler(
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  fs.readdir("blogdata", (err, data) => {
-    if (err) {
-      const errorResponse: any = { error: err.message };
-      res.status(500).json(errorResponse);
-      return;
-    }
-    const successResponse: any = { data };
+  let data:any = await fs.promises.readdir("blogdata");
+  let myFile:any;
+  let allBlogs:any = [];
+  for (let index:number = 0; index < data.length; index++) {
+    const element = data[index];
+    // console.log(element);
+    
+    myFile = await fs.promises.readFile(('blogdata/' + element), 'utf-8')
+    // console.log(myFile)
+    allBlogs.push(JSON.parse(myFile))    
+  }
+    const successResponse: any = { allBlogs };
+    // console.log(allBlogs);
     res.status(200).json(successResponse);
-  });
 }

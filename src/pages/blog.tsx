@@ -1,44 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "@/styles/Blog.module.css";
 import Link from "next/link";
 
-const blog = () => {
-  return (
-    <>
-      <div className={styles.blogs}>
-        <div className={styles.blogitem}>
-          <Link href={"/blogpost/learn-typescript"}>
-            <h3>What is Typescript?</h3>
-          </Link>
-          <p>
-            TypeScript is a programming language that is used to solve problems
-            in web.
-          </p>
-        </div>
-        <div className={styles.blogitem}>
-          <h3>What is Typescript?</h3>
-          <p>
-            TypeScript is a programming language that is used to solve problems
-            in web.
-          </p>
-        </div>
-        <div className={styles.blogitem}>
-          <h3>What is Typescript?</h3>
-          <p>
-            TypeScript is a programming language that is used to solve problems
-            in web.
-          </p>
-        </div>
-        <div className={styles.blogitem}>
-          <h3>What is Typescript?</h3>
-          <p>
-            TypeScript is a programming language that is used to solve problems
-            in web.
-          </p>
-        </div>
-      </div>
-    </>
-  );
+type Blog = {
+  slug: string;
+  title: string;
+  description: string;
 };
 
-export default blog;
+const Blog = () => {
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/blogs')
+      .then((response) => response.json())
+      .then((data) => setBlogs(data.allBlogs));      
+  }, []);
+
+  // console.log(blogs);
+  return (
+    <div>
+     {blogs.map((blog) => ( 
+        <div className={styles.blogs} key={blog.slug}>
+          <div className={styles.blogitem}>
+            <Link href={`/blogpost/${blog.slug}`}>
+              <h3>{blog.title}</h3>
+            </Link>
+            <p>{blog.description.substr(0, 150)}...</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default Blog;
