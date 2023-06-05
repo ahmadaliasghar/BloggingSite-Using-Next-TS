@@ -1,30 +1,25 @@
-import React, { useEffect, useState } from "react";
-import styles from "@/styles/Blog.module.css";
-import Link from "next/link";
-import { GetServerSideProps } from "next";
-// import { log } from "console";
+import React, { useEffect, useState } from 'react';
+import styles from '@/styles/Blog.module.css';
+import Link from 'next/link';
+import { GetStaticProps } from 'next';
+import fs from 'fs/promises';
 
 type Blog = {
-  title: string;
-  description: string;
   slug: string;
+  title: string;
   author: string;
+  description: string;
+  metadesc: string;
 };
 
-export  async function getServerSideProps(context: any) {
-  let data = await fetch('http://localhost:3000/api/blogs');
-  let allBlogs = await data.json();
-  // {console.log(allBlogs)}
-  return {
-    props: {allBlogs},
-  };
+interface BlogProps {
+  allBlogs: Blog[];
 }
 
-
-const Blog = (props: any) => {
-
-  const [blogs, setBlogs] = useState<Blog[]>(props.allBlogs.allBlogs);
+const Blog: React.FC<BlogProps> = (props) => {
+  const [blogs, setBlogs] = useState<Blog[]>(props.allBlogs);
   
+
   return (
     <div>
       {blogs.map((blog) => (
@@ -33,12 +28,26 @@ const Blog = (props: any) => {
             <Link href={`/blogpost/${blog.slug}`}>
               <h3>{blog.title}</h3>
             </Link>
-            <p>{blog.description.substr(0, 150)}...</p>
+            <p>{blog.metadesc.substr(0, 150)}...</p>
           </div>
         </div>
       ))}
     </div>
-    );
-}
+  );
+};
+
+export const getStaticProps: GetStaticProps<BlogProps> = async (context) => {
+  const data = await fs.readdir("blogdata");
+  const allBlogs: Blog[] = await Promise.all(data.map(async (item) => {
+    const myfile = await fs.readFile(('blogdata/' + item), 'utf-8');
+    return JSON.parse(myfile);
+  }));
+
+  return {
+    props: {
+      allBlogs,
+    },
+  };
+};
 
 export default Blog;

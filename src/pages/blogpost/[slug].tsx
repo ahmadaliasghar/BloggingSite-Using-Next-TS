@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
+import React, { useState} from "react";
 import styles from "../../styles/Blogpost.module.css";
+import fs from "fs/promises";
 
 interface Blog {
   slug: string;
@@ -9,27 +9,37 @@ interface Blog {
   author: string;
 }
 
-
-export  async function getServerSideProps(context: any) {
-  // const router = useRouter();
-  // let allBlogs = await data.json();
-  // {console.log(allBlogs)}
-  const { slug } = context.query;
-  let data =  await fetch(`http://localhost:3000/api/getblogs?slug=${slug}`);
-  let blog = await data.json();
-
+export async function getStaticPaths() {
   return {
-    props: {blog},
+      paths: [
+          { params: { slug: 'learn-flask' } },
+          { params: { slug: 'learn-java' } },
+          { params: { slug: 'learn-cpp' } },
+          { params: { slug: 'learn-typescript' } },
+      ],
+      fallback: true // false or 'blocking'
   };
 }
 
+export async function getStaticProps(context:any) {
+  const { slug } = context.params;
+  let myBlog = await fs.readFile(`blogdata/${slug}.json`, 'utf-8')
+  return {
+      props: { myBlog: JSON.parse(myBlog) }, // will be passed to the page component as props
+  }
+}
+
 const BlogPost = (props: any) => {
-  const [blog, setBlog] = useState<Blog>(props.blog);
+  function createMarkup(c:string) {
+    return { __html: c };
+}
+  console.log("blog", props.myBlog)
+  const [blog, setBlog] = useState<Blog>(props.myBlog);
 
   return (
     <div className={styles.main}>
       <h1>{blog.title}</h1>
-      <p className={styles.blogtext}>{blog.description}</p>
+      {blog && <p  className={styles.blogtext} dangerouslySetInnerHTML={createMarkup(blog.description)}></p>}
     </div>
   );
 };
