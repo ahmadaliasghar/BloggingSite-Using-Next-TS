@@ -30,6 +30,7 @@ export default function Home() {
               TypeScript is a programming language that is used to solve
               problems in web.
             </p>
+            
           </div>
           <div className={styles.blogitem}>
             <h3>What is Typescript?</h3>
